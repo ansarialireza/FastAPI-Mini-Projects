@@ -1,0 +1,7 @@
+fastapi
+sqlalchemy
+alembic
+celery
+redis
+locust
+sentry-sdk
