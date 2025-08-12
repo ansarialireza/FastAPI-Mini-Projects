@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Body, status
+from fastapi import FastAPI, status, Query, HTTPException
 from typing import Annotated
 from schemas import TaskCreate, TaskResponse
 
@@ -9,20 +9,39 @@ app = FastAPI()
 tasks_db = []
 
 
-@app.get("/tasks/")
+def genereate_unique_id(db: list) -> int:
+    sorted_task_db = sorted(db, key=lambda x: x['task_id'])
+    if len(db) == 0:
+        return 0
+    return sorted_task_db[-1]["task_id"] + 1
+
+
+@app.get("/tasks/",)
 async def list_tasks():
     return tasks_db
 
 
-@app.get("/tasks/{task_id}", response_model=TaskResponse)
+@app.get("/tasks/{task_id}", response_model=TaskResponse, status_code=status.HTTP_200_OK)
 async def get_task(task_id: int):
-    pass
+    if task_id <= 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Task ID must be positive integer",
+        )
+
+    for task in tasks_db:
+        if task["task_id"] == task_id:
+            return TaskResponse(**task)
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND, detail="Item not found !"
+    )
 
 
 @app.post("/tasks/", response_model=TaskResponse, status_code=status.HTTP_201_CREATED)
-async def add_task(task: Annotated[TaskCreate, Body()]):
+async def add_task(task: Annotated[TaskCreate, Query()]):
+    task_id = genereate_unique_id(tasks_db)
     new_task = {
-        "task_id": 1,
+        "task_id": task_id,
         "title": task.title,
         "description": task.description,
         "status": task.status,
@@ -32,10 +51,24 @@ async def add_task(task: Annotated[TaskCreate, Body()]):
 
 
 @app.put("/tasks/{task_id}", response_model=TaskResponse)
-async def update_task(task_id: int):
-    pass
+async def update_task(task_id: int, task: Annotated[TaskCreate, Query()]):
+    if task_id <= 0:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Task must be positive integer")
+    for item in tasks_db:
+        if item["task_id"] == task_id:
+            item["title"] = task.title
+            item["description"] = task.description
+            item["status"] = task.status
+        return TaskResponse(**item)
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Task with id {task_id} not found !")
 
 
 @app.delete("/tasks/{task_id}")
 async def delete_task(task_id: int):
-    pass
+    if task_id <= 0:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Task must be positive integer")
+    for item in tasks_db:
+        if item["task_id"] == task_id:
+            tasks_db.remove(item)
+        return status.HTTP_204_NO_CONTENT
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Task with id {task_id} not found !")
