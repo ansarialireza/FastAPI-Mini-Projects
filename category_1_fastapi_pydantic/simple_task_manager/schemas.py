@@ -12,8 +12,6 @@ class TasksBase(BaseModel):
     title: str = Field(..., description="This is title for task")
     description: str
     status: TaskStatus
-    # created_at: datetime
-    # updated_at: datetime 
 
 
 class TaskCreate(TasksBase):

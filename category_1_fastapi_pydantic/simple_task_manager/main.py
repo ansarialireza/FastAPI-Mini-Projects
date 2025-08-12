@@ -1,4 +1,4 @@
-from fastapi import FastAPI, status, Query, HTTPException
+from fastapi import FastAPI, status, Body, HTTPException, Response
 from typing import Annotated
 from schemas import TaskCreate, TaskResponse
 
@@ -9,14 +9,13 @@ app = FastAPI()
 tasks_db = []
 
 
-def genereate_unique_id(db: list) -> int:
-    sorted_task_db = sorted(db, key=lambda x: x['task_id'])
-    if len(db) == 0:
+def genereate_unique_task_id(db: list) -> int:
+    if not db:
         return 0
-    return sorted_task_db[-1]["task_id"] + 1
+    return max(db, key=lambda x: x['task_id'])['task_id'] + 1
 
 
-@app.get("/tasks/",)
+@app.get("/tasks/", status_code=status.HTTP_200_OK)
 async def list_tasks():
     return tasks_db
 
@@ -38,8 +37,8 @@ async def get_task(task_id: int):
 
 
 @app.post("/tasks/", response_model=TaskResponse, status_code=status.HTTP_201_CREATED)
-async def add_task(task: Annotated[TaskCreate, Query()]):
-    task_id = genereate_unique_id(tasks_db)
+async def add_task(task: Annotated[TaskCreate, Body()]):
+    task_id = genereate_unique_task_id(tasks_db)
     new_task = {
         "task_id": task_id,
         "title": task.title,
@@ -51,7 +50,7 @@ async def add_task(task: Annotated[TaskCreate, Query()]):
 
 
 @app.put("/tasks/{task_id}", response_model=TaskResponse)
-async def update_task(task_id: int, task: Annotated[TaskCreate, Query()]):
+async def update_task(task_id: int, task: Annotated[TaskCreate, Body()]):
     if task_id <= 0:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Task must be positive integer")
     for item in tasks_db:
@@ -59,16 +58,16 @@ async def update_task(task_id: int, task: Annotated[TaskCreate, Query()]):
             item["title"] = task.title
             item["description"] = task.description
             item["status"] = task.status
-        return TaskResponse(**item)
+            return TaskResponse(**item)
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Task with id {task_id} not found !")
 
 
-@app.delete("/tasks/{task_id}")
+@app.delete("/tasks/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_task(task_id: int):
     if task_id <= 0:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Task must be positive integer")
     for item in tasks_db:
         if item["task_id"] == task_id:
             tasks_db.remove(item)
-        return status.HTTP_204_NO_CONTENT
+            return Response(status_code=status.HTTP_204_NO_CONTENT)
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Task with id {task_id} not found !")
