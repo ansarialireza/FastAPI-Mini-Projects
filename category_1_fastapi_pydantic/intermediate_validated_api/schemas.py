@@ -20,7 +20,7 @@ class TasksBase(BaseModel):
         default=None,
         min_length=10,
         max_length=255,
-        description="This is descriptiion for task",
+        description="This is description for task",
     )
     status: TaskStatus = Field(..., description=" This is status for task")
 
@@ -43,7 +43,7 @@ class TaskUpdate(TasksBase):
         default=None,
         min_length=10,
         max_length=255,
-        description="This is descriptiion for task",
+        description="This is description for task",
     )
     status: Optional[TaskStatus] = Field(
         default=None, description=" This is status for task"

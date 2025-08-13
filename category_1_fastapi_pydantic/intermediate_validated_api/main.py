@@ -1,5 +1,7 @@
 from fastapi import FastAPI, status, Body, Query, HTTPException, Response
 from typing import Annotated, Optional, List
+
+from fastapi.background import P
 from schemas import TaskCreate, TaskResponse, TaskStatus, TaskUpdate
 
 app = FastAPI()
@@ -22,14 +24,24 @@ def generate_unique_task_id(db: list) -> int:
         "description",
     },
 )
-async def list_tasks(status: Annotated[Optional[TaskStatus], Query] = None):
+async def list_tasks(
+    status: Annotated[Optional[TaskStatus], Query] = None,
+    priority: Annotated[
+        Optional[int],
+        Query(ge=1, le=5, description="This is priority for task."),
+    ] = None,
+):
+    status_db = []
+    priority_db = []
     if status:
-        return [
-            TaskResponse(**item)
-            for item in tasks_db
-            if item["status"] == status
+        status_db = [item for item in tasks_db if item["status"] == status]
+    if priority:
+        priority_db = [
+            item for item in tasks_db if item["priority"] == priority
         ]
-    return [TaskResponse(**item) for item in tasks_db]
+    if (not priority) and (not status):
+        return [TaskResponse(**item) for item in tasks_db]
+    return status_db + priority_db
 
 
 @app.get(
