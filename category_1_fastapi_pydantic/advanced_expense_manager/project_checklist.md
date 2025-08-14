@@ -4,14 +4,14 @@
 
 ## Phase 1 – Planning & Design (20–30% time)
 
-- [ ] Review project description and extract **feature list**
-- [ ] Define **project goal** (1-2 sentences)
-- [ ] Design **API routes table** (Method, URL, Description, Request, Response, Status Codes)
-- [ ] Design **folder/file structure** (Architecture)
-- [ ] Specify initial **dependencies** and create `requirements.txt`
+- [x] Review project description and extract **feature list**
+- [x] Define **project goal** (1-2 sentences)
+- [x] Design **API routes table** (Method, URL, Description, Request, Response, Status Codes)
+- [x] Design **folder/file structure** (Architecture)
+- [x] Specify initial **dependencies** and create `requirements.txt`
 - [ ] Identify **edge cases** (invalid input, errors, special conditions)
 - [ ] (For DB projects) Draw **ER diagram** and define relationships
-- [ ] Document all above in `notes.md`
+- [x] Document all above in `notes.md`
 
 ---
 
