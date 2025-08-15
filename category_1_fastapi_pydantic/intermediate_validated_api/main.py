@@ -1,7 +1,5 @@
 from fastapi import FastAPI, status, Body, Query, HTTPException, Response
 from typing import Annotated, Optional, List
-
-from fastapi.background import P
 from schemas import TaskCreate, TaskResponse, TaskStatus, TaskUpdate
 
 app = FastAPI()

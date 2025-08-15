@@ -1,4 +1,10 @@
-from pydantic import BaseModel, Field
+from pydantic import (
+    BaseModel,
+    Field,
+    field_validator,
+    model_validator,
+    validator,
+)
 from typing import Optional
 
 
@@ -16,6 +22,15 @@ class ExpensesBase(BaseModel):
         ..., gt=0, description="Amount must be grater then 0"
     )
     category: Category
+
+    @field_validator("category")
+    def validate_category(cls, category):
+        allowed_categories = ["Food", "Transport", "Health"]
+        if category.name not in allowed_categories:
+            raise ValueError(
+                f"Category {category.name} is not allowed. Allowed is: {allowed_categories} "
+            )
+        return category
 
 
 class ExpenseCreate(ExpensesBase):
@@ -38,5 +53,5 @@ class ExpenseResponse(ExpensesBase):
     id: int = Field(..., description="Unique identifier for the expense")
 
 
-class Summary(BaseModel):
-    pass
+# class Summary(BaseModel):
+#     pass
