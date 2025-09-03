@@ -34,3 +34,15 @@ class User(Base):
 
 
 Base.metadata.create_all(engine)
+
+session = SessionLocal()
+
+# alireza = User(first_name="alireza", last_name="ansari", age=26)
+# session.add(alireza)
+# session.commit()
+
+# retrieve all data
+user = session.query(User).filter_by(first_name="alireza").first()
+
+session.delete(user)
+session.commit()
