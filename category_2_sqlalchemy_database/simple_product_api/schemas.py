@@ -1,14 +1,53 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
+from typing import List, Optional
+from datetime import datetime
+
+
+class CategoryBase(BaseModel):
+    name: str
+    description: Optional[str] = None
+
+
+class CategoryCreate(CategoryBase):
+    pass
+
+
+class CategoryUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+
+
+class Category(CategoryBase):
+    id: int
+
+    class Config:
+        orm_mode = True
 
 
 class ProductBase(BaseModel):
-    name: str = Field(..., max_length=50, description="Product name")
-    price: float = Field(..., max_length=20, description="Product price")
+    name: str
+    description: Optional[str] = None
+    price: float
+    stock_quantity: int
+    category_id: Optional[int] = None
 
 
 class ProductCreate(ProductBase):
     pass
 
 
-class ProductRespinse(ProductBase):
-    id: int = Field(..., description="Product Id")
+class ProductUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    price: Optional[float] = None
+    stock_quantity: Optional[int] = None
+    category_id: Optional[int] = None
+
+
+class Product(ProductBase):
+    id: int
+    created_at: datetime
+    category: Optional[Category]
+
+    class Config:
+        orm_mode = True
