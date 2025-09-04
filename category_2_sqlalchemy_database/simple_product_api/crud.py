@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from simple_product_api import models, schemas
 
 
@@ -59,6 +59,7 @@ def get_products(db: Session, skip: int = 0, limit: int = 10):
 def get_product(db: Session, product_id: int):
     return (
         db.query(models.Product)
+        .options(joinedload(models.Product.category))
         .filter(models.Product.id == product_id)
         .first()
     )

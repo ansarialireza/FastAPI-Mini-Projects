@@ -39,7 +39,7 @@ class ProductCreate(ProductBase):
 class ProductUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
-    price: Optional[float] = None
+    price: Optional[float] = Field(None, gt=0)
     stock_quantity: Optional[int] = None
     category_id: Optional[int] = None
 

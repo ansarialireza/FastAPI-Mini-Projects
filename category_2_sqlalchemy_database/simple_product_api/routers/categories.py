@@ -29,7 +29,7 @@ def read_categories(
     return crud.get_categories(db, skip, limit)
 
 
-@router.get("{category_id}", response_model=schemas.Category)
+@router.get("/{category_id}", response_model=schemas.Category)
 def read_category(category_id: int, db: Session = Depends(get_db)):
     db_category = crud.get_category(db, category_id)
     if not db_category:
@@ -39,7 +39,7 @@ def read_category(category_id: int, db: Session = Depends(get_db)):
     return db_category
 
 
-@router.put("{category_id}", response_model=schemas.CategoryUpdate)
+@router.put("/{category_id}", response_model=schemas.CategoryUpdate)
 def update_category(
     category_id: int,
     category: schemas.CategoryUpdate,
@@ -60,3 +60,4 @@ def delete_category(category_id: int, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Category not found."
         )
+    return db_category
