@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-from typing import List, Optional
+from pydantic import BaseModel, Field
+from typing import Optional
 from datetime import datetime
 
 
@@ -27,7 +27,7 @@ class Category(CategoryBase):
 class ProductBase(BaseModel):
     name: str
     description: Optional[str] = None
-    price: float
+    price: float = Field(..., gt=0)
     stock_quantity: int
     category_id: Optional[int] = None
 
