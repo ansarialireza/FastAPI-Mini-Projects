@@ -13,7 +13,7 @@ class Category(Base):
     description: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 
     products: Mapped[List["Product"]] = relationship(
-        "Product", back_populates="category", cascade="all, delete-orphan"
+        "Product", backref="category", cascade="all, delete-orphan"
     )
 
 
@@ -32,6 +32,6 @@ class Product(Base):
         Integer, ForeignKey("categories.id"), nullable=True
     )
 
-    category: Mapped[Optional[Category]] = relationship(
-        "Category", back_populates="products"
-    )
+    # category: Mapped[Optional[Category]] = relationship(
+    #     "Category", back_populates="products"
+    # )
