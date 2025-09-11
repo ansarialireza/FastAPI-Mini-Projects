@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from app import schemas, models
 
 
-class Category:
+class CategoryCRUD:
     def __init__(
         self,
         db: Session,
@@ -16,7 +16,7 @@ class Category:
         self.db.refresh(db_category)
         return db_category
 
-    def get_categories(self, skip: int = 0, limit: int = 10):
+    def get_categories(self, skip: int, limit: int):
         return self.db.query(models.Category).offset(skip).limit(limit).all()
 
     def get_category(self, id: int):
@@ -45,7 +45,7 @@ class Category:
         return db_category
 
 
-class Product:
+class ProductCRUD:
     def __init__(self, db: Session):
         self.db = db
 
@@ -56,7 +56,7 @@ class Product:
         self.db.refresh(db_product)
         return db_product
 
-    def get_products(self, skip: int = 0, limit: int = 10):
+    def get_products(self, skip: int, limit: int):
         return self.db.query(models.Product).offset(skip).limit(limit).all()
 
     def get_product(self, id: int):
