@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app import schemas, models
 
 
@@ -17,7 +17,13 @@ class CategoryCRUD:
         return db_category
 
     def get_categories(self, skip: int, limit: int):
-        return self.db.query(models.Category).offset(skip).limit(limit).all()
+        return (
+            self.db.query(models.Category)
+            .options(joinedload(models.Category.products))
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
 
     def get_category(self, id: int):
         return (
@@ -57,7 +63,13 @@ class ProductCRUD:
         return db_product
 
     def get_products(self, skip: int, limit: int):
-        return self.db.query(models.Product).offset(skip).limit(limit).all()
+        return (
+            self.db.query(models.Product)
+            .options(joinedload(models.Product.category))
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
 
     def get_product(self, id: int):
         return (
