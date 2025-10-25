@@ -15,28 +15,28 @@ class ProjectCRUD:
         return (
             self.db.query(models.Project)
             .filter(models.Project.id == project_id)
-            .first()
+            .one_or_none()
         )
 
     def get_multi(
-        self, skip: int = 0, limit: int = 100
+        self, skip: int = 0, limit: int = 10
     ) -> List[models.Project]:
         return self.db.query(models.Project).offset(skip).limit(limit).all()
 
     def create(self, project: schemas.ProjectCreate) -> models.Project:
-        db_project = models.Project(**project.model_dump())
-        self.db.add(db_project)
+        project_db = models.Project(**project.model_dump())
+        self.db.add(project_db)
         self.db.commit()
-        self.db.refresh(db_project)
-        return db_project
+        self.db.refresh(project_db)
+        return project_db
 
     def update(
         self, project_id: int, project: schemas.ProjectUpdate
     ) -> Optional[models.Project]:
         db_project = self.get(project_id)
-        if not db_project:
+        if db_project is None:
             return None
-        update_data = project.dict(exclude_unset=True)
+        update_data = project.model_dump(exclude_unset=True)
         for key, value in update_data.items():
             setattr(db_project, key, value)
         self.db.commit()
@@ -44,10 +44,10 @@ class ProjectCRUD:
         return db_project
 
     def delete(self, project_id: int) -> bool:
-        db_project = self.get(project_id)
-        if not db_project:
+        project_db = self.get(project_id)
+        if project_db is None:
             return False
-        self.db.delete(db_project)
+        self.db.delete(project_db)
         self.db.commit()
         return True
 
@@ -106,7 +106,7 @@ class TaskCRUD:
             .filter(models.Project.id == project_id)
             .first()
         )
-        if not db_task or not db_project:
+        if not db_task or db_project is None:
             return None
         db_task.projects.append(db_project)
         self.db.commit()
